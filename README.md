@@ -1,1 +1,3 @@
-# data-driven-portfolio
+# Arista
+
+Project for building data driven portfolio / market insights.
