@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Decode Google Service credentials to file
         run: |
-          echo $(SERVICE_ACCOUNT) | base64 --decode >> service-account-file.json
+          echo $(SERVICE_ACCOUNT_CREDENTIALS) | base64 --decode >> service-account-file.json
       - name: Install Poetry
         run: |
           pip install poetry==$(cat .poetry-version)
