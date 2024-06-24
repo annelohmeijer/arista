@@ -16,17 +16,35 @@ class GoogleSheetAPI:
         creds, _ = google.auth.default()
         self._service = build("sheets", "v4", credentials=creds)
         self.spreadsheet_id = spreadsheet_id or os.environ["SPREADSHEET_ID"]
+        self.funding_rate_sheet = "FundingRate"
 
-    def get_values(self, range_name: str = "A1:C2"):
+    def get_values(self, range_name: str = "A1:Z10000"):
         """Get values from Google Sheet in range."""
+        range_ = f"{self.funding_rate_sheet}!{range_name}"
         result = (
             self._service.spreadsheets()
             .values()
-            .get(spreadsheetId=self.spreadsheet_id, range=range_name)
+            .get(spreadsheetId=self.spreadsheet_id, range=range_)
             .execute()
         )
         rows = result.get("values", [])
         return rows
+
+    def put_values(self, values: list[list], range_name: str) -> None:
+        range_ = f"{self.funding_rate_sheet}!{range_name}"
+        body = {"values": values}
+        result = (
+            self._service.spreadsheets()
+            .values()
+            .update(
+                spreadsheetid=self.spreadsheet_id,
+                range=range_,
+                valueInputOption="USER_ENTERED",
+                body=body,
+            )
+            .execute()
+        )
+        return result
 
 
 def main():

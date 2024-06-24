@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 import os
 
 
@@ -23,7 +24,7 @@ class CoinglassAPI:
         r = requests.get(url, params=params, headers=self._get_headers())
         r.raise_for_status()
         r = r.json()
-        if r["code"] != 0:
+        if int(r["code"]) != 0:
             raise ValueError(r["msg"])
         return r["data"]
 
@@ -42,4 +43,10 @@ class CoinglassAPI:
         the number of historical prices is limited to 1000, regardless of the interval."""
         path = "/futures/fundingRate/ohlc-history"
         params = {"exchange": exchange, "symbol": symbol, "interval": interval}
-        return self.get(path=path, params=params)
+        data = self.get(path=path, params=params)
+        for d in data:
+            d["utc"] = self.unix_to_utc(d["t"])
+        return data
+
+    def unix_to_utc(self, unix_time: int) -> str:
+        return datetime.utcfromtimestamp(unix_time).strftime("%Y-%m-%d %H:%M:%S")
