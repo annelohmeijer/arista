@@ -19,3 +19,6 @@ google-auth-httplib2 = "^0.2.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+google = "arista.google_sheets:main"

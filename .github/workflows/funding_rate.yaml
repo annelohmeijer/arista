@@ -1,0 +1,21 @@
+name: Fetch Coinglass 8hr funding rate
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Poetry
+        run: |
+          pip install poetry==$(cat .poetry-version)
+      - name: Install dependencies
+        run: |
+          poetry install --no-interaction --no-root
+      - name: Run script
+        shell: bash
+        run: |
+          poetry run google
+
