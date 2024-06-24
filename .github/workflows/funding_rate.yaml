@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Decode Google Service credentials to file
+        run: |
+          echo $(SERVICE_ACCOUNT) | base64 --decode >> service-account-file.json
       - name: Install Poetry
         run: |
           pip install poetry==$(cat .poetry-version)
@@ -16,6 +19,10 @@ jobs:
           poetry install --no-interaction --no-root
       - name: Run script
         shell: bash
+        env:
+          SERVICE_ACCOUNT: service-account-file.json
+          COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
+          SPREADSHEET_ID: ${{ vars.SPREADSHEET_ID }}
         run: |
           poetry run google
 
