@@ -1,0 +1,33 @@
+volumes:
+  pgdata:
+
+services:
+  db:
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - 5432:5432
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE:-arista}
+      PGDATA: /var/lib/postgresql/data/arista
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+    - postgres
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_container
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "80:80"
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
