@@ -3,10 +3,10 @@ volumes:
 
 services:
   db:
-    container_name: postgres
-    hostname: postgres
+    container_name: aristadb
+    hostname: aristadb
     ports:
-      - 5432:5432
+      - 5433:5433
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
