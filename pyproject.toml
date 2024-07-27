@@ -13,10 +13,11 @@ google-auth = "^2.30.0"
 google-api-python-client = "^2.134.0"
 google-auth-oauthlib = "^1.2.0"
 google-auth-httplib2 = "^0.2.0"
-pandas = "^2.2.2"
-
+pydantic = "^2.7.1"
+psycopg2-binary = "2.9.5"
 sqlmodel = "^0.0.21"
 alembic = "^1.13.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

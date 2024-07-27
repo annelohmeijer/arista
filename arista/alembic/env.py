@@ -3,10 +3,9 @@ import os
 from logging.config import fileConfig
 
 from alembic import context
+from models.funding_rate import FundingRate
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
-
-from arista.models.funding_rate import FundingRate
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

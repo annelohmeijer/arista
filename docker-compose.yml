@@ -6,7 +6,7 @@ services:
     container_name: aristadb
     hostname: aristadb
     ports:
-      - 5433:5433
+      - 5433:5432
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -16,7 +16,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-    - postgres
+    - digital-lions_postgres
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin_container
@@ -26,8 +26,10 @@ services:
     ports:
       - "80:80"
     networks:
-      - postgres
+      - digital-lions_postgres 
 
+# using network from other side project such 
+# that I can use the same pgadmin instance for both servers
 networks:
-  postgres:
-    driver: bridge
+  digital-lions_postgres:
+    external: true

@@ -15,3 +15,5 @@ lint:
 format: lint
 	poetry run ruff format arista
 
+db.ip: 
+	docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' aristadb
