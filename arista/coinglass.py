@@ -1,33 +1,8 @@
 import os
-from dataclasses import dataclass
-from datetime import datetime
 
 import requests
 
-
-@dataclass
-class FundingRate:
-    """Dataclass object for FundingRate that is returned by Coinglass API."""
-
-    t: int
-    o: float
-    h: float
-    l: float
-    c: float
-
-    def __post_init__(self):
-        """Add utc field to Rate object from timestamp."""
-        self.utc = self._timestamp_to_utc(self.t)
-
-    def _timestamp_to_utc(
-        self, unix_time, str_format: str = "%Y-%m-%d %H:%M:%S"
-    ) -> str:
-        """Convert unix timestamp to UTC time."""
-        return datetime.utcfromtimestamp(unix_time).strftime(str_format)
-
-    def to_list(self) -> list:
-        """Convert Rate object to list, suitable for writing to Google Sheets."""
-        return [self.t, self.utc, self.o, self.h, self.l, self.c]
+from arista.models.funding_rate import FundingRate
 
 
 class CoinglassAPI:
@@ -66,12 +41,15 @@ class CoinglassAPI:
 
     def get_funding_rate(
         self, exchange: str = "Binance", symbol: str = "BTCUSDT", interval: str = "8h"
-    ) -> list[Rate]:
+    ) -> list[FundingRate]:
         """Get funding rate for futures trading on exchange. On this endpoint
         the number of historical prices is limited to 1000, regardless of the interval.
         """
         path = "/futures/fundingRate/ohlc-history"
         params = {"exchange": exchange, "symbol": symbol, "interval": interval}
         data = self.get(path=path, params=params)
-        rates = [FundingRate(**d) for d in data]
-        return rates
+        return data
+        # rates = [
+        #     FundingRate(d | {"exchange": exchange, "symbol": symbol}) for d in data
+        # ]
+        # return rates

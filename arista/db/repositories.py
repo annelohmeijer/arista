@@ -1,8 +1,9 @@
 from typing import Generic, TypeVar
 
-from exceptions import ItemNotFoundException
 from sqlalchemy import and_, delete
 from sqlmodel import Session, SQLModel
+
+from arista.exceptions import ItemNotFoundException
 
 Model = TypeVar("Model", bound=SQLModel)
 ModelCreate = TypeVar("ModelCreate", bound=SQLModel)
@@ -27,6 +28,14 @@ class BaseRepository(Generic[Model]):
         self._session.commit()
         self._session.refresh(new_obj)
         return new_obj
+
+    def bulk_create(self, objs: list[ModelCreate]):
+        """Create multiple objects in the table."""
+        # self._session.bulk_insert_mappings(self._model, )
+        new_objs = [self._model.model_validate(obj) for obj in objs]
+        self._session.bulk_save_objects(new_objs)
+        self._session.commit()
+        return new
 
     def delete(self, object_id: int) -> None:
         """Delete an object from the table."""
