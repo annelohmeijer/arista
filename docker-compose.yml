@@ -6,11 +6,12 @@ services:
     container_name: aristadb
     hostname: aristadb
     ports:
-      - 5433:5432
+      - 5433:5433
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGPORT: ${POSTGRES_PORT}
       POSTGRES_DB: ${POSTGRES_DATABASE:-arista}
       PGDATA: /var/lib/postgresql/data/arista
     volumes:

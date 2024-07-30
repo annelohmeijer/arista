@@ -15,6 +15,7 @@ class FundingRate(SQLModel):
     l: float = Field(description="Low")
     c: float = Field(description="Close")
     t: float = Field(description="Unix timestamp time in seconds")
+    interval: str = Field(description="Metric interval (e.g. '4h')")
 
     def _timestamp_to_utc(self, unix_time, format_: str = "%Y-%m-%d %H:%M:%S") -> str:
         return datetime.utcfromtimestamp(unix_time).strftime(format_)
@@ -33,7 +34,7 @@ class FundingRateTable(FundingRate, table=True):
     id: int = Field(default=None, primary_key=True)
 
 
-class FundingRateRepository(BaseRepository[FundingRate]):
+class FundingRateRepository(BaseRepository[FundingRateTable]):
     """Repository to interact with Child table."""
 
-    _model = FundingRate
+    _model = FundingRateTable
