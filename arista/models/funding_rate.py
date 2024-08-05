@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from pydantic import computed_field
 from sqlmodel import Field, SQLModel
 
 from arista.db.repositories import BaseRepository
@@ -8,17 +9,22 @@ from arista.db.repositories import BaseRepository
 class FundingRate(SQLModel):
     """Model for OHLC funding rate history from Coinglass API."""
 
-    exchange: str = Field()
+    exchange: str = Field(description="Exchange name", default="Binance")
     symbol: str = Field()
     o: float = Field(description="Open")
     h: float = Field(description="High")
     l: float = Field(description="Low")
     c: float = Field(description="Close")
-    t: float = Field(description="Unix timestamp time in seconds")
-    interval: str = Field(description="Metric interval (e.g. '4h')")
+    t: int = Field(description="Unix timestamp time in seconds")
+    interval: str = Field(description="Metric interval (e.g. 4h)")
+
+    @computed_field
+    @property
+    def utc(self) -> datetime:
+        return self._timestamp_to_utc(self.t)
 
     def _timestamp_to_utc(self, unix_time, format_: str = "%Y-%m-%d %H:%M:%S") -> str:
-        return datetime.utcfromtimestamp(unix_time).strftime(format_)
+        return datetime.utcfromtimestamp(unix_time)
 
     def to_list(self):
         # order matters here

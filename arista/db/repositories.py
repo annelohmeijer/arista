@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import Generic, TypeVar
 
-from sqlalchemy import and_, delete
+from sqlalchemy import and_, delete, func
 from sqlmodel import Session, SQLModel
 
 from arista.db.session import get_session
@@ -18,6 +19,7 @@ class BaseRepository(Generic[Model]):
     operations as well as custom queries."""
 
     _model: type[Model]
+    strftime_format: str = "%Y-%m-%d %H:%M:%S"
 
     def __init__(self):
         """Initialize the repository with a database session."""
@@ -56,6 +58,26 @@ class BaseRepository(Generic[Model]):
         if not obj:
             raise ItemNotFoundException()
         return obj
+
+    def max(self, attr: str = "t") -> float | int:
+        """Get the object with the maximum value of an attribute.
+        Default attribute is 't' for the timestamp."""
+        return self._session.exec(func.max(getattr(self._model, attr))).scalar()
+
+    def min(self, attr: str = "t") -> float | int:
+        """Get the object with the minimum value of an attribute.
+        Default attribute is 't' for the timestamp."""
+        return self._session.exec(func.min(getattr(self._model, attr))).scalar()
+
+    def max_timestamp(self) -> float | None:
+        """Get the object with the maximum timestamp."""
+        max_t = self.max(attr="t")
+        return datetime.utcfromtimestamp(max_t).strftime(self.strftime_format)
+
+    def min_timestamp(self) -> float | None:
+        """Get the object with the minimum timestamp."""
+        min_t = self.min(attr="t")
+        return datetime.utcfromtimestamp(min_t).strftime(self.strftime_format)
 
     def read_all(self) -> list[ModelOut] | None:
         """Read all objects from the table."""
