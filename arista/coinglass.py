@@ -1,8 +1,11 @@
+import logging
 import os
 
 import requests
 
 from arista.models.funding_rate import FundingRate
+
+logger = logging.getLogger(__name__)
 
 
 class CoinglassAPI:
@@ -10,9 +13,12 @@ class CoinglassAPI:
 
     URL: str = "https://open-api-v3.coinglass.com/api"
     RATE_LIMIT_REQUESTS_PER_MIN: int = 30
+    RESPONSE_LIMIT: int = 4500
     API_KEY = "COINGLASS_API_KEY"
 
     def __init__(self):
+        """Instantiate CoinglassAPI."""
+        logger.info("Initializing CoinglassAPI")
         self._api_key = os.environ.get(self.API_KEY)
         if self._api_key is None:
             raise ValueError(f"{self.API_KEY} not set.")
@@ -36,13 +42,31 @@ class CoinglassAPI:
         path = "/futures/supported-coins"
         return self._get(path=path)
 
-    def _get_funding_rate(
-        self, exchange: str = "Binance", symbol: str = "BTCUSDT", interval: str = "4h"
+    def get_funding_rate(
+        self,
+        symbol: str,
+        exchange: str = "Binance",
+        interval: str = "4h",
+        response_limit: int = None,
+        start_time: int = None,
+        end_time: int = None,
     ) -> list[FundingRate]:
         """Get funding rate for futures trading on exchange. On this endpoint
         the number of historical prices is limited to 1000, regardless of the interval.
         """
         path = "/futures/fundingRate/ohlc-history"
-        params = {"exchange": exchange, "symbol": symbol, "interval": interval}
+        params = {
+            "exchange": exchange,
+            "symbol": symbol,
+            "interval": interval,
+            "limit": response_limit or self.RESPONSE_LIMIT,
+            "startTime": start_time,
+            "endTime": end_time,
+        }
+        logger.info(f"Calling {path} with params {params}")
         data = self._get(path=path, params=params)
-        return data
+
+        return [
+            FundingRate(exchange=exchange, symbol=symbol, interval=interval, **v)
+            for v in data
+        ]

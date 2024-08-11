@@ -17,3 +17,4 @@ format: lint
 
 db.ip: 
 	docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' aristadb
+

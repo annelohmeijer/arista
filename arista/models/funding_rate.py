@@ -17,18 +17,14 @@ class FundingRate(SQLModel):
     c: float = Field(description="Close")
     t: int = Field(description="Unix timestamp time in seconds")
     interval: str = Field(description="Metric interval (e.g. 4h)")
+    utc: datetime = Field(description="UTC time", default=None)
 
-    @computed_field
-    @property
-    def utc(self) -> datetime:
-        return self._timestamp_to_utc(self.t)
+    def model_post_init(self, __context):
+        """Add UTC field after initialization."""
+        self.utc = self._timestamp_to_utc(self.t)
 
     def _timestamp_to_utc(self, unix_time, format_: str = "%Y-%m-%d %H:%M:%S") -> str:
         return datetime.utcfromtimestamp(unix_time)
-
-    def to_list(self):
-        # order matters here
-        return [self.t, self.utc, self.o, self.h, self.l, self.c]
 
 
 class FundingRateTable(FundingRate, table=True):

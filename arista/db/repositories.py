@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Generic, TypeVar
 
-from sqlalchemy import and_, delete, func
+from sqlalchemy import and_, delete, func, select
 from sqlmodel import Session, SQLModel
 
 from arista.db.session import get_session
@@ -19,7 +19,7 @@ class BaseRepository(Generic[Model]):
     operations as well as custom queries."""
 
     _model: type[Model]
-    strftime_format: str = "%Y-%m-%d %H:%M:%S"
+    STRFTIME_FORMAT: str = "%Y-%m-%d %H:%M:%S"
 
     def __init__(self):
         """Initialize the repository with a database session."""
@@ -59,25 +59,33 @@ class BaseRepository(Generic[Model]):
             raise ItemNotFoundException()
         return obj
 
-    def max(self, attr: str = "t") -> float | int:
-        """Get the object with the maximum value of an attribute.
-        Default attribute is 't' for the timestamp."""
-        return self._session.exec(func.max(getattr(self._model, attr))).scalar()
+    def max_timestamp(self, symbol: str) -> datetime | None:
+        """Get the object with the maximum timestamp for a symbol."""
+        filters = [("symbol", symbol)]
+        max_t = self.max("t", filters)
+        return datetime.utcfromtimestamp(max_t) if max_t else None
 
-    def min(self, attr: str = "t") -> float | int:
-        """Get the object with the minimum value of an attribute.
-        Default attribute is 't' for the timestamp."""
-        return self._session.exec(func.min(getattr(self._model, attr))).scalar()
+    def max(self, col: str, filters: list[tuple[str, str]]) -> float | None:
+        """Get the max value of a column,
+        optionally with a where clause."""
+        expr = and_(*self._construct_filter(filters))
+        stmt = select(func.max(getattr(self._model, col))).where(and_(expr))
+        max_t = self._session.exec(stmt).scalar()
+        return max_t
 
-    def max_timestamp(self) -> float | None:
-        """Get the object with the maximum timestamp."""
-        max_t = self.max(attr="t")
-        return datetime.utcfromtimestamp(max_t).strftime(self.strftime_format)
+    def min_timestamp(self, symbol: str) -> datetime | None:
+        """Get the object with the minimum timestamp for a symbol."""
+        filters = [("symbol", symbol)]
+        min_t = self.min("t", filters)
+        return datetime.utcfromtimestamp(min_t) if min_t else None
 
-    def min_timestamp(self) -> float | None:
-        """Get the object with the minimum timestamp."""
-        min_t = self.min(attr="t")
-        return datetime.utcfromtimestamp(min_t).strftime(self.strftime_format)
+    def min(self, col: str, filters: list[tuple[str, str]]) -> float | None:
+        """Get the min value of a column,
+        optionally with a where clause."""
+        expr = and_(*self._construct_filter(filters))
+        stmt = select(func.min(getattr(self._model, col))).where(and_(expr))
+        min_t = self._session.exec(stmt).scalar()
+        return min_t
 
     def read_all(self) -> list[ModelOut] | None:
         """Read all objects from the table."""
