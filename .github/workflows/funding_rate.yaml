@@ -1,4 +1,4 @@
-name: Fetch Coinglass 8hr funding rate
+name: Sync database funding_rates
 
 on:
   workflow_dispatch:
@@ -8,13 +8,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set Python version
+        run: |
+          PYTHON_VERSION=$(cat .python-version)
+          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
+      - name: Set Poetry version
+        run: |
+          POETRY_VERSION=$(cat .poetry-version)
+          echo "POETRY_VERSION=$POETRY_VERSION" >> $GITHUB_ENV
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: $(cat .python-version}
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Install Poetry
         run: |
-          pip install poetry==$(cat .poetry-version)
+          pip install poetry==${{ env.POETRY_VERSION }}
       - name: Install dependencies
         run: |
           poetry install --no-interaction --no-root
