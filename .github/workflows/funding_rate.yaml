@@ -1,4 +1,4 @@
-name: Sync database funding_rates
+name: Sync database Funding Rates
 
 on:
   workflow_dispatch:

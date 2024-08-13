@@ -8,6 +8,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+!.python-version
 
 # C extensions
 *.so
@@ -67,8 +68,6 @@ cover/
 .ipynb_checkpoints
 *.ipynb
 
-# pyenv
-.python-version
 
 # celery beat schedule file
 celerybeat-schedule
