@@ -58,7 +58,7 @@ def sync_database(end_time: datetime, exchange: str, symbol: str, interval: str)
         logger.warning(f"Found {records} records to insert")
 
 
-if __name__ == "__main__":
+def main():
     """Sync script to fetch funding rates from
     Coinglass API and store them in the database."""
 
@@ -73,3 +73,7 @@ if __name__ == "__main__":
             end_time = datetime(2024, month, 1)
 
             sync_database(end_time, exchange, symbol, interval)
+
+
+if __name__ == "__main__":
+    main()

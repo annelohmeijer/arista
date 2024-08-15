@@ -1,7 +1,7 @@
 name: Sync database Funding Rates
 
 on:
-  workflow_dispatch:
+  push:
 
 jobs:
   fetch:
@@ -32,4 +32,4 @@ jobs:
           COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
           POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
         run: |
-          poetry run python arista/main.py
+          poetry run python3 arista/main.py

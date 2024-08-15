@@ -25,4 +25,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-google_sheets = "arista.google_sheets:main"
+sync = "arista.main:main"
