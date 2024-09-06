@@ -3,7 +3,7 @@ import os
 
 import requests
 
-from arista.models.funding_rate import FundingRate
+from arista.models.ohlc_history import OHLCHistory
 
 logger = logging.getLogger(__name__)
 
@@ -42,19 +42,20 @@ class CoinglassAPI:
         path = "/futures/supported-coins"
         return self._get(path=path)
 
-    def get_funding_rate(
+    def get_olhc_history(
         self,
         symbol: str,
-        exchange: str = "Binance",
-        interval: str = "4h",
+        future: str,
+        exchange: str,
+        interval: str,
         response_limit: int = None,
         start_time: int = None,
         end_time: int = None,
-    ) -> list[FundingRate]:
-        """Get funding rate for futures trading on exchange. On this endpoint
+    ) -> list[OHLCHistory]:
+        """Get OHLC history for futures trading on exchange. On this endpoint
         the number of historical prices is limited to 1000, regardless of the interval.
         """
-        path = "/futures/fundingRate/ohlc-history"
+        path = f"/futures/{future}/ohlc-history"
         params = {
             "exchange": exchange,
             "symbol": symbol,
@@ -67,6 +68,6 @@ class CoinglassAPI:
         data = self._get(path=path, params=params)
 
         return [
-            FundingRate(exchange=exchange, symbol=symbol, interval=interval, **v)
+            OHLCHistory(exchange=exchange, symbol=symbol, interval=interval, **v)
             for v in data
         ]

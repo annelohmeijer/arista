@@ -2,8 +2,8 @@
 import os
 from logging.config import fileConfig
 
+import models
 from alembic import context
-from models.funding_rate import FundingRate
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
 
