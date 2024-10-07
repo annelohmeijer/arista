@@ -2,8 +2,8 @@ name: Sync OpenInterest & Funding Rate
 
 on:
   schedule:
-    # Coinglass API interval is 4h so we update 10 minutes after each interval
-    - 10 */4 * * *
+  # Coinglass API interval is 4h so we update 10 minutes after each interval
+  - cron: 10 */4 * * *
   push:
 
 jobs:
@@ -11,29 +11,29 @@ jobs:
     name: Sync Database
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set Python version
-        run: |
-          PYTHON_VERSION=$(cat .python-version)
-          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
-      - name: Set Poetry version
-        run: |
-          POETRY_VERSION=$(cat .poetry-version)
-          echo "POETRY_VERSION=$POETRY_VERSION" >> $GITHUB_ENV
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-      - name: Install Poetry
-        run: |
-          pip install poetry==${{ env.POETRY_VERSION }}
-      - name: Install dependencies
-        run: |
-          poetry install --no-interaction --no-root
-      - name: Run script
-        shell: bash
-        env:
-          COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
-          POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
-        run: |
-          poetry run sync
+    - uses: actions/checkout@v4
+    - name: Set Python version
+      run: |
+        PYTHON_VERSION=$(cat .python-version)
+        echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
+    - name: Set Poetry version
+      run: |
+        POETRY_VERSION=$(cat .poetry-version)
+        echo "POETRY_VERSION=$POETRY_VERSION" >> $GITHUB_ENV
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Install Poetry
+      run: |
+        pip install poetry==${{ env.POETRY_VERSION }}
+    - name: Install dependencies
+      run: |
+        poetry install --no-interaction --no-root
+    - name: Run script
+      shell: bash
+      env:
+        COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
+        POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
+      run: |
+        poetry run sync
