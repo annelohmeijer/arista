@@ -1,4 +1,3 @@
-
 from arista.db.repositories import BaseRepository
 from datetime import datetime
 
@@ -9,7 +8,7 @@ class OHLCHistory(SQLModel):
     """Model for OHLC history from Coinglass API.
 
     Note this model is future agnostic: all OLHC history futures
-    returned by Coinglass are returned in the same format. 
+    returned by Coinglass are returned in the same format.
     """
 
     exchange: str = Field(description="Exchange name", default="Binance")
@@ -29,7 +28,6 @@ class OHLCHistory(SQLModel):
 
     def _timestamp_to_utc(self, unix_time, format_: str = "%Y-%m-%d %H:%M:%S") -> str:
         return datetime.utcfromtimestamp(unix_time)
-
 
 
 class OHLCHistoryTable(OHLCHistory, table=True):

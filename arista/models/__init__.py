@@ -1,3 +1,3 @@
-from .ohlc_history import OHLCHistory 
+from .ohlc_history import OHLCHistoryRepository
 
-__all__ = ["OHLCHistory"]
+__all__ = ["OHLCHistoryRepository"]

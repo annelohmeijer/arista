@@ -1,9 +1,8 @@
 # config that contains which pairs to maintain in database
 # see https://docs.coinglass.com/reference/instruments
-# each table should have an exisitng repository
 
-funding_rate:
-  binance:
+fundingRate:
+  symbols:
     - BTCUSDT
     - ETHUSDT
     - SOLUSDT
@@ -13,8 +12,15 @@ funding_rate:
     - TONUSDT
     - 1000PEPEUSDT
     - LTCUSDT
-open_interest:
-  binance:
-
-
+openInterest:
+  symbols:
+    - BTCUSDT
+    - ETHUSDT
+    - SOLUSDT
+    - XRPUSDT
+    - BNBUSDT
+    - DOGEUSDT
+    - TONUSDT
+    - 1000PEPEUSDT
+    - LTCUSDT
 

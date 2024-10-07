@@ -1,11 +1,12 @@
 import logging
 from datetime import datetime
-from enum import Enum
 
 import yaml
 
 from arista.coinglass import CoinglassAPI
 from arista import models
+
+INTERVAL = "4h"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,26 +14,30 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-INTERVAL = "4h"
-
-
 client = CoinglassAPI()
 
-class Repositories(str, Enum):
-    """Utility class to store all repositories,
-    such that can be easily accessed by table name."""
-    funding_rate = models.FundingRateRepository()
-    open_interest = models.OpenInterestRepository()
 
-
-def sync_database(table: str, end_time: datetime, exchange: str, symbol: str, interval: str):
+def sync_database(
+    end_time: datetime,
+    exchange: str,
+    symbol: str,
+    interval: str,
+    future: str,
+    table: str = "ohlc",
+):
     """Sync database with funding rates from Coinglass API."""
 
-    logger.info(f"Updating table {table} for {symbol} until {end_time}")
+    logger.info(
+        f"Updating OHLC History table for future {future}, "
+        f"symbol {symbol} until {end_time}"
+    )
 
     # get data from Coinglass API
-    repository = Repositories.get(table)
-    min_, max_ = repository.min_timestamp(symbol), repository.max_timestamp(symbol)
+    repository = models.OHLCHistoryRepository()
+
+    min_, max_ = repository.min_timestamp(
+        symbol=symbol, coinglass_future=future
+    ), repository.max_timestamp(symbol=symbol, coinglass_future=future)
     logger.info(f"Current range in database for {symbol}: {min_} - {max_}")
 
     if max_ is not None and max_ > end_time:
@@ -41,7 +46,11 @@ def sync_database(table: str, end_time: datetime, exchange: str, symbol: str, in
 
     # get data from Coinglass API
     records = client.get_ohlc_history(
-        symbol=symbol, end_time=int(end_time.timestamp(), future=repository.coinglass_future)
+        symbol=symbol,
+        end_time=int(end_time.timestamp()),
+        future=future,
+        exchange=exchange,
+        interval=interval,
     )
     data_min_t, data_max_t = (
         min(f.utc for f in records),
@@ -60,7 +69,8 @@ def sync_database(table: str, end_time: datetime, exchange: str, symbol: str, in
             max(f.utc for f in records),
         )
         logger.info(
-            f"Inserting {len(records)} records into the database from range ({records_min} - {records_max})"
+            f"Inserting {len(records)} records into the database "
+            f"from range ({records_min} - {records_max})"
         )
         repository.bulk_create(records)
     else:
@@ -77,14 +87,21 @@ def main():
     """Sync script to fetch funding rates from
     Coinglass API and store them in the database."""
 
-    conf = get_config("config/exchanges.yml")
+    conf = get_config("../config/exchanges.yml")
 
     # fill data per month starting in January
+    exchange = "Binance"
     end_time = datetime.now()
-    for table, exchange in conf.items():
-        for symbol in exchange["symbols"]:
-            sync_database(end_time, exchange, symbol, interval=INTERVAL, table=table)
+    for future, symbols in conf.items():
+        for symbol in symbols["symbols"]:
+            sync_database(
+                end_time=end_time,
+                exchange=exchange,
+                symbol=symbol,
+                interval=INTERVAL,
+                future=future,
+            )
+
 
 if __name__ == "__main__":
     main()
-

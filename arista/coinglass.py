@@ -42,7 +42,7 @@ class CoinglassAPI:
         path = "/futures/supported-coins"
         return self._get(path=path)
 
-    def get_olhc_history(
+    def get_ohlc_history(
         self,
         symbol: str,
         future: str,
@@ -68,6 +68,12 @@ class CoinglassAPI:
         data = self._get(path=path, params=params)
 
         return [
-            OHLCHistory(exchange=exchange, symbol=symbol, interval=interval, **v)
+            OHLCHistory(
+                exchange=exchange,
+                symbol=symbol,
+                interval=interval,
+                coinglass_future=future,
+                **v,
+            )
             for v in data
         ]

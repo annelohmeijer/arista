@@ -9,6 +9,7 @@ from arista.exceptions import ItemNotFoundException
 
 Model = TypeVar("Model", bound=SQLModel)
 
+
 class BaseRepository(Generic[Model]):
     """Generic repository template metaclass for all repositories that
     interact with a table in the database. Supports all classic CRUD
@@ -55,9 +56,9 @@ class BaseRepository(Generic[Model]):
             raise ItemNotFoundException()
         return obj
 
-    def max_timestamp(self, symbol: str) -> datetime | None:
+    def max_timestamp(self, symbol: str, coinglass_future: str) -> datetime | None:
         """Get the object with the maximum timestamp for a symbol."""
-        filters = [("symbol", symbol)]
+        filters = [("symbol", symbol), ("coinglass_future", coinglass_future)]
         max_t = self.max("t", filters)
         return datetime.utcfromtimestamp(max_t) if max_t else None
 
@@ -69,9 +70,9 @@ class BaseRepository(Generic[Model]):
         max_t = self._session.exec(stmt).scalar()
         return max_t
 
-    def min_timestamp(self, symbol: str) -> datetime | None:
+    def min_timestamp(self, symbol: str, coinglass_future: str) -> datetime | None:
         """Get the object with the minimum timestamp for a symbol."""
-        filters = [("symbol", symbol)]
+        filters = [("symbol", symbol), ("coinglass_future", coinglass_future)]
         min_t = self.min("t", filters)
         return datetime.utcfromtimestamp(min_t) if min_t else None
 

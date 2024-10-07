@@ -8,7 +8,6 @@ URL=https://open-api-v3.coinglass.com/api/futures/supported-coins
 api:
 	curl -H "CG-API-KEY: $(COINGLASS_API_KEY)" $(URL)
 
-
 lint: 
 	poetry run ruff check arista
 
