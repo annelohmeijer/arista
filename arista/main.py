@@ -87,7 +87,7 @@ def main():
     """Sync script to fetch funding rates from
     Coinglass API and store them in the database."""
 
-    conf = get_config("../config/exchanges.yml")
+    conf = get_config("config/exchanges.yml")
 
     # fill data per month starting in January
     exchange = "Binance"
