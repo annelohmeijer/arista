@@ -3,8 +3,8 @@ from datetime import datetime
 
 import yaml
 
-from arista.coinglass import CoinglassAPI
 from arista import models
+from arista.api.coinglass import CoinglassAPI
 
 INTERVAL = "4h"
 

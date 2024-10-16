@@ -1,14 +1,14 @@
-name: Sync OpenInterest & Funding Rate
+name: Fetch and insert CoinMarketCap latest
 
 on:
   schedule:
   # Coinglass API interval is 4h so we update 10 minutes after each interval
-  - cron: 10 */4 * * *
+  - cron: 0 */4 * * *
   push:
 
 jobs:
   sync:
-    name: Sync Database
+    name: Populate Database
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
     - name: Run script
       shell: bash
       env:
-        COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
+        COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
         POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
       run: |
-        poetry run sync_coinglass
+        poetry run sync_cmc

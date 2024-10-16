@@ -1,7 +1,8 @@
-from arista.db.repositories import BaseRepository
 from datetime import datetime
 
 from sqlmodel import Field, SQLModel
+
+from arista.db.repositories import BaseRepository
 
 
 class OHLCHistory(SQLModel):
