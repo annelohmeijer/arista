@@ -5,6 +5,7 @@ services:
   db:
     container_name: aristadb
     hostname: aristadb
+    # different port than default to not interfere with other 
     ports:
       - 5433:5433
     image: postgres

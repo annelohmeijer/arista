@@ -21,10 +21,15 @@ class CoinMarketCapHistory(SQLModel):
     # price info
     price: float = Field(description="Price")
     volume_24h: float = Field(description="24h volume")
-    volume_change_24h: float = Field(description="24h volume change")
+    volume_change_24h: float | None = Field(
+        description="24h volume change", default=None
+    )
     market_cap: float = Field(description="Market cap")
-    fully_diluted_market_cap: float = Field(description="Fully diluted market cap")
+    fully_diluted_market_cap: float | None = Field(
+        description="Fully diluted market cap", default=None
+    )
     utc: datetime = Field(description="UTC time", default=None)
+    iso_date: str = Field(description="ISO time", default=None)
 
 
 class CoinMarketCapHistoryTable(CoinMarketCapHistory, table=True):

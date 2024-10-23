@@ -33,39 +33,42 @@ class CoinMarketCapAPI:
         r = requests.get(url, params=params, headers=self._get_headers())
         r.raise_for_status()
         r = r.json()
-        return r
-
-    def get_supported_coins(self) -> dict:
-        """Get supported coins for futures trading."""
-        path = "/futures/supported-coins"
-        return self._get(path=path)
+        return r["data"]
 
     def listing_latest(self) -> list:
         """Get latest CoinMarketCap listing
         https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest
         """
         path = "/listings/latest"
-        data = self._get(path)["data"]
+        data = self._get(path)
 
-        timestamp_fmt = "%Y-%m-%dT%H:%M:%S.%fZ"
-        values = [
-            CoinMarketCapHistory(
-                cmc_rank=d["cmc_rank"],
-                cmc_id=d["id"],
-                name=d["name"],
-                symbol=d["symbol"],
-                market_cap_by_total_supply=d["quote"]["USD"]["price"]
-                * d["total_supply"],  # Calculated market cap by total supply
-                circulating_supply=d["circulating_supply"],
-                total_supply=d["total_supply"],
-                # max_supply=d["max_supply"],
-                price=d["quote"]["USD"]["price"],
-                volume_24h=d["quote"]["USD"]["volume_24h"],
-                volume_change_24h=d["quote"]["USD"]["volume_change_24h"],
-                market_cap=d["quote"]["USD"]["market_cap"],
-                fully_diluted_market_cap=d["quote"]["USD"]["fully_diluted_market_cap"],
-                utc=datetime.strptime(d["last_updated"], timestamp_fmt),
-            )
-            for d in data
-        ]
+        values = [self._json_to_model(d) for d in data]
         return values
+
+    def listing_historical(self, date: str) -> list:
+        """Timestamp: ISO timestamp e.g. '2019-10-20'"""
+        path = "/listings/historical"
+        data = self._get(path, params={"date": date})
+        values = [self._json_to_model(d, date) for d in data]
+        return values
+
+    def _json_to_model(self, d: dict, date=str):
+        timestamp_fmt = "%Y-%m-%dT%H:%M:%S.%fZ"
+        return CoinMarketCapHistory(
+            cmc_rank=d["cmc_rank"],
+            cmc_id=d["id"],
+            name=d["name"],
+            symbol=d["symbol"],
+            market_cap_by_total_supply=d["quote"]["USD"]["price"]
+            * d["total_supply"],  # Calculated market cap by total supply
+            circulating_supply=d["circulating_supply"],
+            total_supply=d["total_supply"],
+            # max_supply=d["max_supply"],
+            price=d["quote"]["USD"]["price"],
+            volume_24h=d["quote"]["USD"]["volume_24h"],
+            # volume_change_24h=d["quote"]["USD"]["volume_change_24h"],
+            market_cap=d["quote"]["USD"]["market_cap"],
+            # fully_diluted_market_cap=d["quote"]["USD"]["fully_diluted_market_cap"],
+            utc=datetime.strptime(d["last_updated"], timestamp_fmt),
+            iso_date=date,
+        )
