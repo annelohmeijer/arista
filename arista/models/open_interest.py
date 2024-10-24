@@ -39,3 +39,4 @@ class OpenInterestRepository(BaseRepository[OpenInterestTable]):
     """Repository to interact with open interest table."""
 
     _model = OpenInterestTable
+    timestamp_col = "timestamp"

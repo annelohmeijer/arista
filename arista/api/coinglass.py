@@ -3,7 +3,7 @@ import os
 
 import requests
 
-from arista.models.ohlc_history import OHLCHistory
+from arista.models.open_interest import OpenInterest
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +15,7 @@ class CoinglassAPI:
     RATE_LIMIT_REQUESTS_PER_MIN: int = 30
     RESPONSE_LIMIT: int = 4500
     API_KEY = "COINGLASS_API_KEY"
+    SOURCE: str = "coinglass"
 
     def __init__(self):
         """Instantiate CoinglassAPI."""
@@ -42,22 +43,18 @@ class CoinglassAPI:
         path = "/futures/supported-coins"
         return self._get(path=path)
 
-    def get_ohlc_history(
+    def get_aggregated_open_interest_history(
         self,
         symbol: str,
-        future: str,
-        exchange: str,
         interval: str,
         response_limit: int = None,
         start_time: int = None,
         end_time: int = None,
-    ) -> list[OHLCHistory]:
-        """Get OHLC history for futures trading on exchange. On this endpoint
-        the number of historical prices is limited to 1000, regardless of the interval.
-        """
-        path = f"/futures/{future}/ohlc-history"
+    ) -> list[OpenInterest]:
+        """Query futures/openInterest/ohlc-aggregated-history
+        endpoint from Coinglass API."""
+        path = "/futures/openInterest/ohlc-aggregated-history"
         params = {
-            "exchange": exchange,
             "symbol": symbol,
             "interval": interval,
             "limit": response_limit or self.RESPONSE_LIMIT,
@@ -68,11 +65,10 @@ class CoinglassAPI:
         data = self._get(path=path, params=params)
 
         return [
-            OHLCHistory(
-                exchange=exchange,
+            OpenInterest(
                 symbol=symbol,
                 interval=interval,
-                coinglass_future=future,
+                aggregated_funding_rate=v["o"],
                 **v,
             )
             for v in data

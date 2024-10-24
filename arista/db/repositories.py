@@ -16,6 +16,7 @@ class BaseRepository(Generic[Model]):
     operations as well as custom queries."""
 
     _model: type[Model]
+    timestamp_col: str
     STRFTIME_FORMAT: str = "%Y-%m-%d %H:%M:%S"
 
     def __init__(self):
@@ -56,10 +57,12 @@ class BaseRepository(Generic[Model]):
             raise ItemNotFoundException()
         return obj
 
-    def max_timestamp(self, symbol: str, coinglass_future: str) -> datetime | None:
-        """Get the object with the maximum timestamp for a symbol."""
-        filters = [("symbol", symbol), ("coinglass_future", coinglass_future)]
-        max_t = self.max("t", filters)
+    def max_timestamp(
+        self, col: str = None, filters: list[tuple[str, str]] = None
+    ) -> datetime | None:
+        """Get the object with the maximum timestamp."""
+        timestamp_col = col or self.timestamp_col
+        max_t = self.max(timestamp_col, filters)
         return datetime.utcfromtimestamp(max_t) if max_t else None
 
     def max(self, col: str, filters: list[tuple[str, str]]) -> float | None:
@@ -70,10 +73,12 @@ class BaseRepository(Generic[Model]):
         max_t = self._session.exec(stmt).scalar()
         return max_t
 
-    def min_timestamp(self, symbol: str, coinglass_future: str) -> datetime | None:
-        """Get the object with the minimum timestamp for a symbol."""
-        filters = [("symbol", symbol), ("coinglass_future", coinglass_future)]
-        min_t = self.min("t", filters)
+    def min_timestamp(
+        self, col: str = None, filters: list[tuple[str, str]] = None
+    ) -> datetime | None:
+        """Get the object with the minimum timestamp."""
+        timestamp_col = col or self.timestamp_col
+        min_t = self.min(timestamp_col, filters)
         return datetime.utcfromtimestamp(min_t) if min_t else None
 
     def min(self, col: str, filters: list[tuple[str, str]]) -> float | None:

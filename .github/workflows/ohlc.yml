@@ -1,9 +1,9 @@
 name: Sync OpenInterest & Funding Rate
 
 on:
-  schedule:
+  # schedule:
   # Coinglass API interval is 4h so we update 10 minutes after each interval
-  - cron: 10 */4 * * *
+  # - cron: 10 */4 * * *
   push:
 
 jobs:

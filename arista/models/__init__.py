@@ -1,5 +1,9 @@
+from .funding_rate import FundingRateRepository
 from .marketcap import CoinMarketCapHistoryRepository
-from .open_interest import OpenInterest
-from .funding_rate import FundingRate
+from .open_interest import OpenInterestRepository
 
-__all__ = [CoinMarketCapHistoryRepository, OpenInterest, FundingRate]
+__all__ = [
+    CoinMarketCapHistoryRepository,
+    OpenInterestRepository,
+    FundingRateRepository,
+]

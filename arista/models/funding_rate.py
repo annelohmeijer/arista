@@ -34,7 +34,9 @@ class FundingRateTable(FundingRate, table=True):
 
     id: int = Field(default=None, primary_key=True)
 
+
 class FundingRateRepository(BaseRepository[FundingRateTable]):
     """Repository to interact with funding rate table."""
 
     _model = FundingRateTable
+    timestamp_col = "timestamp"

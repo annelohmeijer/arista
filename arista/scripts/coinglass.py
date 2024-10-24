@@ -18,26 +18,22 @@ client = CoinglassAPI()
 
 
 def sync_database(
+    repository,
     end_time: datetime,
-    exchange: str,
     symbol: str,
     interval: str,
-    future: str,
-    table: str = "ohlc",
 ):
     """Sync database with funding rates from Coinglass API."""
 
     logger.info(
-        f"Updating OHLC History table for future {future}, "
+        f"Updating {repository._model.__tablename__} for"
         f"symbol {symbol} until {end_time}"
     )
 
-    # get data from Coinglass API
-    repository = models.OHLCHistoryRepository()
-
-    min_, max_ = repository.min_timestamp(
-        symbol=symbol, coinglass_future=future
-    ), repository.max_timestamp(symbol=symbol, coinglass_future=future)
+    filters = [("symbol", symbol)]
+    min_, max_ = repository.min_timestamp(filters=filters), repository.max_timestamp(
+        filters=filters
+    )
     logger.info(f"Current range in database for {symbol}: {min_} - {max_}")
 
     if max_ is not None and max_ > end_time:
@@ -45,13 +41,15 @@ def sync_database(
         return
 
     # get data from Coinglass API
-    records = client.get_ohlc_history(
+    records = client.get_aggregated_open_interest_history(
         symbol=symbol,
         end_time=int(end_time.timestamp()),
-        future=future,
-        exchange=exchange,
         interval=interval,
     )
+    import pdb
+
+    pdb.set_trace()
+
     data_min_t, data_max_t = (
         min(f.utc for f in records),
         max(f.utc for f in records),
@@ -89,17 +87,14 @@ def main():
 
     conf = get_config("config/exchanges.yml")
 
-    # fill data per month starting in January
-    exchange = "Binance"
     end_time = datetime.now()
     for future, symbols in conf.items():
         for symbol in symbols["symbols"]:
             sync_database(
                 end_time=end_time,
-                exchange=exchange,
                 symbol=symbol,
                 interval=INTERVAL,
-                future=future,
+                repository=models.OpenInterestRepository(),
             )
 
 
