@@ -12,7 +12,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-
 def main():
     # get data from Coinglass API
     client = CoinMarketCapAPI()
@@ -55,4 +54,3 @@ def main():
         logger.info(f"Fetching coinmarketcap data for: {date}")
         data = client.listing_historical(date=date)
         repository.bulk_create(data)
-
