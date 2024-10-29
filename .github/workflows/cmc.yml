@@ -48,8 +48,8 @@ jobs:
       - name: Send Telegram message if pipeline fails
         uses: appleboy/telegram-action@master
         with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
+          to: "${{ secrets.TELEGRAM_TO }}"
+          token: "${{ secrets.TELEGRAM_TOKEN }}"
           message: |
             Pipeline ${{ github.workflow }} failed,
             so database is not up to date.
