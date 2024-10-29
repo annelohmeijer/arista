@@ -1,10 +1,10 @@
 name: Sync latest CoinMarketCap data
 
 on:
+  workflow_dispatch:
   schedule:
   # Coinglass API interval is 4h so we update 10 minutes after each interval
   - cron: 0 */4 * * *
-  push:
 
 jobs:
   sync:
