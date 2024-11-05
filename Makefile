@@ -11,3 +11,6 @@ format:
 db.ip: 
 	docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' aristadb
 
+db.pwd:
+	railway variables --kv | grep POSTGRES_PASSWORD
+
