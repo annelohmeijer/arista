@@ -1,12 +1,10 @@
 import logging
-from datetime import datetime
-
-import yaml
+from datetime import datetime, timedelta
 
 from arista import models
 from arista.api.coinglass import CoinglassAPI
 
-INTERVAL = "4h"
+INTERVAL = "12h"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,6 +17,7 @@ client = CoinglassAPI()
 
 def sync_database(
     repository,
+    start_time: datetime,
     end_time: datetime,
     symbol: str,
     interval: str,
@@ -43,12 +42,10 @@ def sync_database(
     # get data from Coinglass API
     records = client.get_aggregated_open_interest_history(
         symbol=symbol,
+        start_time=int(start_time.timestamp()),
         end_time=int(end_time.timestamp()),
         interval=interval,
     )
-    import pdb
-
-    pdb.set_trace()
 
     data_min_t, data_max_t = (
         min(f.utc for f in records),
@@ -75,26 +72,23 @@ def sync_database(
         logger.warning(f"Found {records} records to insert")
 
 
-def get_config(path: str):
-    """Get configuration from a file."""
-    with open(path) as file:
-        return yaml.safe_load(file)
-
-
 def main():
     """Sync script to fetch funding rates from
     Coinglass API and store them in the database."""
 
-    conf = get_config("config/exchanges.yml")
+    symbols = client.get_supported_coins()
 
+    start_time = datetime.now() - timedelta(days=350)
     end_time = datetime.now()
-    for future, symbols in conf.items():
-        for symbol in symbols["symbols"]:
+
+    for repository in [models.OpenInterestRepository(), models.FundingRateRepository()]:
+        for symbol in symbols:
             sync_database(
+                repository=repository,
+                start_time=start_time,
                 end_time=end_time,
                 symbol=symbol,
                 interval=INTERVAL,
-                repository=models.OpenInterestRepository(),
             )
 
 

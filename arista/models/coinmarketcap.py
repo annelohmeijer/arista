@@ -35,7 +35,7 @@ class CoinMarketCapHistory(SQLModel):
 class CoinMarketCapHistoryTable(CoinMarketCapHistory, table=True):
     """Database model for Coinmarketcap history."""
 
-    __tablename__ = "coin_market_cap"
+    __tablename__ = "coinmarketcap"
 
     id: int = Field(default=None, primary_key=True)
 
