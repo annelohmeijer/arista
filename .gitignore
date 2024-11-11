@@ -61,12 +61,8 @@ cover/
 *.mo
 *.pot
 
-# IPython Notebook
-*.ipynb_checkpoints
-
 # Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
+*.ipynb*
 
 
 # celery beat schedule file

@@ -4,7 +4,7 @@ from datetime import datetime
 
 import requests
 
-from arista.models.deribit import DeribitFutures 
+from arista.models.deribit import DeribitFutures
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class DeribitAPI:
         return {"accept": "application/json", "X-CMC_PRO_API_KEY": self._api_key}
 
     def _get(self, path: str, params=None):
-        """Make a GET request to Deribit API.""" 
+        """Make a GET request to Deribit API."""
         url = f"{self.base_url}{path}"
         r = requests.get(url, params=params)
         r.raise_for_status()
@@ -46,5 +46,3 @@ class DeribitAPI:
         response = self._get(path=path, params=params)
         data = response["result"]
         return data
-
-

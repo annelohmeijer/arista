@@ -21,15 +21,11 @@ instruments = [i["instrument_name"] for i in currency_instruments]
 for instrument in instruments:
     data = client.get_instrument(instrument_name=instrument)
 
-    import pdb; pdb.set_trace()
+    import pdb
+
+    pdb.set_trace()
 
     logger.info(data)
 
-
     repository = models.DeribitFuturesRepository()
     repository.bulk_create(data)
-
-
-
-
-

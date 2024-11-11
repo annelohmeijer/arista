@@ -1,9 +1,17 @@
 import os
 from functools import lru_cache
 
-from alembic import command
-from alembic.config import Config
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlmodel import Session, SQLModel, create_engine
+
+
+@lru_cache
+def get_async_engine():
+    """Get a cached aysync database engine."""
+    postgres_url = os.environ.get("POSTGRES_DATABASE_URL")
+    if postgres_url is None:
+        raise ValueError("POSTGRES_DATABASE_URL not set.")
+    return create_async_engine(postgres_url, echo=True)
 
 
 @lru_cache
@@ -15,16 +23,12 @@ def get_engine():
     return create_engine(postgres_url)
 
 
-def init_db():
-    """Setup db and create tables"""
-    engine = get_engine()
-    SQLModel.metadata.create_all(engine)
-
-
-def run_migrations():
-    """Run migrations with Alembic"""
-    alembic_cfg = Config("alemibic.ini")
-    command.upgrade(alembic_cfg, "head")
+def get_async_session() -> AsyncSession:
+    """Get an asynchronous database session."""
+    engine = get_async_engine()
+    async_session = AsyncSession(bind=engine, expire_on_commit=False)
+    
+    return async_session
 
 
 def get_session() -> Session:
