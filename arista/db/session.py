@@ -27,7 +27,7 @@ def get_async_session() -> AsyncSession:
     """Get an asynchronous database session."""
     engine = get_async_engine()
     async_session = AsyncSession(bind=engine, expire_on_commit=False)
-    
+
     return async_session
 
 

@@ -1,5 +1,6 @@
-from arista.db.repositories import BaseRepository
 from sqlmodel import Field, SQLModel
+
+from arista.db.repositories import BaseRepository
 
 
 class FundingRate(SQLModel, table=True):

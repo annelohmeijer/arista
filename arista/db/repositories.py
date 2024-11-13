@@ -47,13 +47,12 @@ class BaseRepository(Generic[Model]):
     #     async with self._session.begin():
     #         await self._session.execute(
     #             self._model.__table__.insert(), [obj.dict() for obj in objs]
-            # )
+    # )
 
     def bulk_create(self, objs: list[Model]):
         """Create multiple objects in the table."""
         self._session.bulk_insert_mappings(self._model, objs)
         self._session.commit()
-
 
     async def delete(self, object_id: int) -> None:
         """Delete an object from the table by its ID.
