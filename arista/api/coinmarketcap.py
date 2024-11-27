@@ -4,7 +4,7 @@ from datetime import datetime
 
 import requests
 
-from arista.models.marketcap import CoinMarketCapHistory
+from arista.models.coinmarketcap import CoinMarketCapHistory
 
 logger = logging.getLogger(__name__)
 
@@ -45,15 +45,29 @@ class CoinMarketCapAPI:
         values = [self._json_to_model(d) for d in data]
         return values
 
-    def listing_historical(self, date: str) -> list:
+    def listing_historical(self, date: str = None, datetime_: datetime = None) -> list:
         """Timestamp: ISO timestamp e.g. '2019-10-20'"""
         path = "/listings/historical"
+
+        if datetime_:
+            date = datetime_.isoformat().split("T")[0]
+        if not date and not datetime_:
+            raise ValueError(
+                "Either date or dateteime_ should be passed as function argument."
+            )
+
         data = self._get(path, params={"date": date})
         values = [self._json_to_model(d, date) for d in data]
         return values
 
-    def _json_to_model(self, d: dict, date=str):
+    def _json_to_model(self, d: dict, date: str = None):
         timestamp_fmt = "%Y-%m-%dT%H:%M:%S.%fZ"
+        date = (
+            date
+            or datetime.strptime(d["last_updated"], timestamp_fmt)
+            .isoformat()
+            .split("T")[0]
+        )
         return CoinMarketCapHistory(
             cmc_rank=d["cmc_rank"],
             cmc_id=d["id"],

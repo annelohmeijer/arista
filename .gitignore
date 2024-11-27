@@ -63,6 +63,7 @@ cover/
 
 # Jupyter Notebook
 *.ipynb*
+*.ropeproject/
 
 
 # celery beat schedule file

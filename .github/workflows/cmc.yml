@@ -37,7 +37,7 @@ jobs:
         POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
       run: |
         set -e
-        poetry run sync_cmc0
+        poetry run sync_cmc
 
   # notify_on_failure:
   #   name: Notify in Telegram

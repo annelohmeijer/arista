@@ -44,3 +44,4 @@ class CoinMarketCapHistoryRepository(BaseRepository[CoinMarketCapHistoryTable]):
     """Repository to interact with CoinMarketCap history table."""
 
     _model = CoinMarketCapHistoryTable
+    timestamp_col = "utc"

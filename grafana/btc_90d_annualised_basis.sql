@@ -40,7 +40,7 @@ ON
 
 select 
 	datetime_,
-	(quarterly_future_price/perpetual_future_price - 1) / days_between_future_and_datetime/ 365 ::DOUBLE PRECISION as btc_90d_annualised_basis
+	(quarterly_future_price/perpetual_future_price - 1) / (days_between_future_and_datetime/ 365 ::DOUBLE PRECISION) as btc_90d_annualised_basis
 from btc_90d_annualised_basis
 
 

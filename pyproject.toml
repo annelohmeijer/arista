@@ -16,6 +16,7 @@ pyyaml = "^6.0.2"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
 asyncpg = "^0.30.0"
 
+enlighten = "^1.12.4"
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
 isort = "^5.13.2"
@@ -34,6 +35,6 @@ skip_glob = ["arista/alembic/*"]
 
 [tool.poetry.scripts]
 sync_coinglass = "arista.scripts.coinglass:main"
-sync_cmc = "arista.scripts.cmc:main"
+sync_cmc = "arista.scripts.coinmarketcap:main"
 
 

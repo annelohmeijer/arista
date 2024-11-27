@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class DeribitFuture(BaseModel):
-
     asset: str = Field(description="BTC or ETH")
 
     instrument: str = Field(description="Deribit instrument name")
@@ -25,6 +24,7 @@ class DeribitFuture(BaseModel):
     datetime_: datetime = Field(
         description="Datetime of unix timestamp, for readability"
     )
+    size: int | None = Field(default=None, description="Size of the future contract")
 
 
 class Future(str, Enum):
@@ -33,11 +33,15 @@ class Future(str, Enum):
     current_week = "current_week"
     next_week = "next_week"
     current_month = "current_month"
+
     current_quarter = "current_quarter"
-    first_month_next_quarter = "first_month_next_quarter"
+    # skipping the first month of next quarter as we do not get any data
+    # first_month_next_quarter = "first_month_next_quarter"
+
     quarter_1 = "quarter_1"
     quarter_2 = "quarter_2"
     quarter_3 = "quarter_3"
+    #
     perperpetual = "perpetual"
 
 
@@ -67,7 +71,7 @@ class DeribitAPI:
 
     async def get_instruments(self, currency: str) -> list[dict]:
         path = "/get_instruments"
-        params = {"currency": currency, "kind": "future", "expired": "false"}
+        params = {"currency": currency, "kind": "future", "expired": "true"}
         response = await self._get(path=path, params=params)
         data = response["result"]
         return data
@@ -84,29 +88,43 @@ class DeribitAPI:
         response = await self._get(path=path, params=params)
         return response
 
-    async def get_future_data(
-        self, date: str, future: Future, symbol: str = "BTC"
-    ) -> DeribitFuture:
-        """Get Future data for any date in the past."""
-        datetime_ = datetime.strptime(date, self.DATE_FORMAT)
+    async def get_historical_instruments(
+        self, date: datetime, symbol: str = "BTC"
+    ) -> dict:
+        """Get all instruments for given symbol on given date."""
 
-        # determine min and max timestamp for current date (i.e 00:00 and 24:00 of any given day)
-        start_timestamp = int(time.mktime(datetime_.timetuple()))
-        end_timestamp = int(
-            time.mktime((datetime_ + timedelta(days=1, seconds=-1)).timetuple())
-        )
-
-        expiration_dates = self.compute_initial_expiration_dates(datetime_)
+        expiration_dates = self.compute_initial_expiration_dates(date)
 
         # Roll over expiration dates if necessary
-        expiration_dates = self.roll_over_expiration_dates(
-            expiration_dates, current_date
-        )
+        expiration_dates = self.roll_over_expiration_dates(expiration_dates, date)
 
         # Format instrument names
         futures = self.format_instrument_names(expiration_dates, symbols=[symbol])
+        return futures
 
-        instrument_name = futures[future][symbol]
+    async def get_future_data_from_date(
+        self, date: datetime, future: Future, symbol: str
+    ) -> DeribitFuture:
+        """Get Future data for any date in the past."""
+        futures = await self.get_historical_instruments(date)
+        data = await self.get_future_data_from_instrument_name(
+            date=date,
+            future=future,
+            instrument_name=futures[future][symbol],
+            symbol="BTC",
+        )
+        return data
+
+    async def get_future_data_from_instrument_name(
+        self, date: datetime, future: Future, instrument_name: str, symbol: str
+    ) -> DeribitFuture:
+        """Get Future data for any date in the past."""
+
+        # determine min and max timestamp for current date (i.e 00:00 and 24:00 of any given day)
+        start_timestamp = int(time.mktime(date.timetuple()))
+        end_timestamp = int(
+            time.mktime((date + timedelta(days=1, seconds=-1)).timetuple())
+        )
 
         data = await self.get_tradingview_data(
             params={
@@ -118,8 +136,9 @@ class DeribitAPI:
         )
 
         if data["result"]["status"] == "no_data":
-            logger.warning(
-                f"Deribit API returned no data for {date}, future {future}: {instrument_name}"
+            raise ValueError(
+                f"Deribit API returned no data for {
+                    date}, future {future}: {instrument_name}"
             )
 
         record = DeribitFuture(
@@ -179,7 +198,9 @@ class DeribitAPI:
 
         return expiration_dates
 
-    def roll_over_expiration_dates(self, expiration_dates, current_date):
+    def roll_over_expiration_dates(
+        self, expiration_dates: dict, current_date: datetime
+    ) -> dict:
         # Roll over expiration dates if they are reached
         rolled_expirations = {}
         for key, expiration_date in expiration_dates.items():
@@ -223,6 +244,10 @@ class DeribitAPI:
             instruments[period] = instrument_names
 
         # Add perpetual futures for BTC and ETH
-        instruments["perpetual"] = {symbol: f"{symbol}-PERPETUAL" for symbol in symbols}
+        instruments["perpetual"] = {
+            symbol: f"{
+                symbol}-PERPETUAL"
+            for symbol in symbols
+        }
 
         return instruments

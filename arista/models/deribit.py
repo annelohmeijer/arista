@@ -1,13 +1,11 @@
 from datetime import datetime
-from typing import List, Optional
 
-from sqlmodel import Field, SQLModel, UniqueConstraint
+from sqlmodel import Field, SQLModel
 
 from arista.db.repositories import BaseRepository
 
 
 class DeribitFuture(SQLModel):
-
     asset: str = Field(description="BTC or ETH")
     instrument: str = Field(description="Deribit instrument name")
     future_reference: str = Field(description="future type")
@@ -18,6 +16,7 @@ class DeribitFuture(SQLModel):
     datetime_: datetime = Field(
         description="Datetime of unix timestamp, for readability"
     )
+    size: float | None = Field(description="Size of the future contract", default=None)
 
 
 class DeribitFuturesTable(DeribitFuture, table=True):
