@@ -45,7 +45,7 @@ async def fetch(symbol="BTC"):
 
     date = get_nearest_resolution_time(datetime.now(), resolution)
 
-    pbar = manager.counter(total=len(Future), desc="Futures", unit="ticks")
+    pbar = manager.counter(total=len(Future), desc=f"{symbol} futures", unit="ticks")
 
     data = []
     no_data = []
@@ -117,8 +117,13 @@ async def fetch(symbol="BTC"):
 
     logger.info(f"Inserting {len(data)} records into the database, {symbol}")
     repository = models.DeribitFuturesRepository()
-    repository.bulk_create(data)
+    # repository.bulk_create(data)
 
 
-asyncio.run(fetch("BTC"))
-asyncio.run(fetch("ETH"))
+async def main_async():
+    await fetch("BTC")
+    await fetch("ETH")
+
+
+def main():
+    asyncio.run(main_async())

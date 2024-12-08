@@ -37,5 +37,7 @@ skip_glob = ["arista/alembic/*"]
 [tool.poetry.scripts]
 sync_coinglass = "arista.scripts.coinglass:main"
 sync_cmc = "arista.scripts.coinmarketcap:main"
+sync_deribit = "arista.scripts.deribit:main"
+
 
 
