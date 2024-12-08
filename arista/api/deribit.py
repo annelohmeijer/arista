@@ -27,6 +27,10 @@ class DeribitFuture(BaseModel):
     size: int | None = Field(default=None, description="Size of the future contract")
 
 
+class CustomError(Exception):
+    pass
+
+
 class Future(str, Enum):
     """Different type of futures."""
 
@@ -116,22 +120,27 @@ class DeribitAPI:
         return data
 
     async def get_future_data_from_instrument_name(
-        self, date: datetime, future: Future, instrument_name: str, symbol: str
+        self,
+        date: datetime,
+        future: Future,
+        instrument_name: str,
+        symbol: str,
+        resolution: int = 360,
     ) -> DeribitFuture:
         """Get Future data for any date in the past."""
 
         # determine min and max timestamp for current date (i.e 00:00 and 24:00 of any given day)
-        start_timestamp = int(time.mktime(date.timetuple()))
-        end_timestamp = int(
-            time.mktime((date + timedelta(days=1, seconds=-1)).timetuple())
+        start_timestamp = int(
+            time.mktime((date - timedelta(minutes=resolution)).timetuple())
         )
+        end_timestamp = int(time.mktime(date.timetuple()))
 
         data = await self.get_tradingview_data(
             params={
                 "start_timestamp": start_timestamp * 1000,
                 "end_timestamp": end_timestamp * 1000,
                 "instrument_name": instrument_name,
-                "resolution": "1D",
+                "resolution": resolution,
             }
         )
 
@@ -141,13 +150,16 @@ class DeribitAPI:
                     date}, future {future}: {instrument_name}"
             )
 
+        # check timestamp of record
+        record_unix_timestamp = int(int(data["usOut"]) / 1000)
+
         record = DeribitFuture(
             asset=symbol,
             instrument=instrument_name,
             future_reference=future,
             expiration=None,
             price=data["result"]["close"][0],
-            unix_timestamp=start_timestamp,
+            unix_timestamp=record_unix_timestamp,
             datetime_=datetime.fromtimestamp(start_timestamp),
         )
         return record
@@ -244,10 +256,6 @@ class DeribitAPI:
             instruments[period] = instrument_names
 
         # Add perpetual futures for BTC and ETH
-        instruments["perpetual"] = {
-            symbol: f"{
-                symbol}-PERPETUAL"
-            for symbol in symbols
-        }
+        instruments["perpetual"] = {symbol: f"{symbol}-PERPETUAL" for symbol in symbols}
 
         return instruments

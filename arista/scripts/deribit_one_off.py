@@ -22,12 +22,12 @@ manager = enlighten.get_manager()
 client = DeribitAPI()
 
 
-async def fetch(symbol="BTC"):
+async def fetch(symbol="ETH"):
     """Async function to fetch Deribit data for a given symbol."""
 
     global client
-    start_date = datetime.strptime("2023-01-01", client.DATE_FORMAT)
-    end_date = datetime.strptime("2024-01-01", client.DATE_FORMAT)
+    start_date = datetime.strptime("2024-11-01", client.DATE_FORMAT)
+    end_date = datetime.strptime("2024-12-08", client.DATE_FORMAT)
     dates = [
         start_date + timedelta(days=x) for x in range((end_date - start_date).days)
     ]
@@ -61,13 +61,13 @@ async def fetch(symbol="BTC"):
                 )
                 data.append(d)
                 logger.info(
-                    f"Successfully obtained Deribit future data for {
-                        date_string}, future {future}, symbol {symbol}"
+                    "Successfully obtained Deribit future data for"
+                    f" {date_string}, future {future}, symbol {symbol}"
                 )
             except ValueError as exc:
                 logger.error(
-                    f"No data for {date_string} for instrument {
-                        instrument_name}, {future}, symbol {symbol}"
+                    f"No data for {date_string} for instrument "
+                    f"{instrument_name}, {future}, symbol {symbol}"
                 )
                 no_data.append(
                     {
@@ -80,8 +80,8 @@ async def fetch(symbol="BTC"):
                 )
             except KeyError as exc:
                 logger.error(
-                    f"Failed request {date_string} for instrument {
-                        instrument_name}, {future}, symbol {symbol}"
+                    f"Failed request {date_string} for instrument "
+                    f"{instrument_name}, {future}, symbol {symbol}"
                 )
                 failed.append(
                     {

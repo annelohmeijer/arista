@@ -17,9 +17,14 @@ def main():
     client = CoinMarketCapAPI()
     repository = models.CoinMarketCapHistoryRepository()
 
-    logger.info(f"Fetching latest coinmarketcap data")
+    logger.info(f"Fetching latest coinmarketcap data for top 100 cryptocurrencies")
     data = client.listing_latest()
 
+    if not data:
+        raise ValueError("No data fetched from coinmarketcap")
+
+    datetime = data[0].uct
+    logger.info(f"Data fetched for {datetime}")
     repository.bulk_create(data)
 
 

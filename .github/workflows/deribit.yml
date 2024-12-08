@@ -1,0 +1,41 @@
+name: Fetch latest Futures Deribit
+
+on:
+  workflow_dispatch:
+  schedule:
+  # Deribit resolution is 360 (every six hour) so we do every hour after
+  - cron: 10 1,7,13,19 * * *
+
+jobs:
+  sync:
+    name: Fetch deribit
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set Python version
+      run: |
+        PYTHON_VERSION=$(cat .python-version)
+        echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
+    - name: Set Poetry version
+      run: |
+        POETRY_VERSION=$(cat .poetry-version)
+        echo "POETRY_VERSION=$POETRY_VERSION" >> $GITHUB_ENV
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Install Poetry
+      run: |
+        pip install poetry==${{ env.POETRY_VERSION }}
+    - name: Install dependencies
+      run: |
+        poetry install --no-interaction --no-root
+    - name: Run script
+      shell: bash
+      env:
+        DERIBIT_API_KEY: ${{ secrets>DERIBIT_API_KEY }}
+        POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
+      run: |
+        set -e
+        poetry run python3 arista/scripts/deribit.py
+
