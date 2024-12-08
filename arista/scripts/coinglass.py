@@ -98,7 +98,7 @@ def main():
     # repositories = [models.FundingRateRepository(), models.OpenInterestRepository()]
     for repository in [models.OpenInterestRepository()]:
         for symbol in symbols:
-            time.sleep(1)
+            time.sleep(2)
             sync_database(
                 repository=repository,
                 start_time=start_time,

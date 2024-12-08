@@ -7,7 +7,7 @@ from arista.models.open_interest import OpenInterest
 
 logger = logging.getLogger(__name__)
 
-RATE_LIMIT_EXCEEDED = 50001
+RATE_LIMIT_EXCEEDED = "50001"
 
 
 class CoinglassAPI:
