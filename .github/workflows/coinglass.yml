@@ -1,4 +1,4 @@
-name: Sync OpenInterest & Funding Rate
+name: Sync OpenInterest & Funding Rate from Coinglass
 
 on:
   schedule:

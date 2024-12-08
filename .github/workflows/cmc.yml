@@ -1,4 +1,4 @@
-name: Sync latest CoinMarketCap data
+name: Sync CoinMarketCap data
 
 on:
   workflow_dispatch:
