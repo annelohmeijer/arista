@@ -52,7 +52,7 @@ jobs:
           to: "${{ secrets.TELEGRAM_TO }}"
           token: "${{ secrets.TELEGRAM_TOKEN }}"
           message: |
-            Pipeline **${{ github.workflow }}** failed,
+            Pipeline ${{ github.workflow }} failed,
             so database is not up to date.
 
             Link to workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

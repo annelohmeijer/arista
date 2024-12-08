@@ -34,6 +34,7 @@ jobs:
       shell: bash
       env:
         COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
+        COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
         POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
       run: |
         poetry install
@@ -51,7 +52,7 @@ jobs:
           to: "${{ secrets.TELEGRAM_TO }}"
           token: "${{ secrets.TELEGRAM_TOKEN }}"
           message: |
-            Pipeline **${{ github.workflow }}** failed,
+            Pipeline ${{ github.workflow }} failed,
             so database is not up to date.
 
             Link to workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
