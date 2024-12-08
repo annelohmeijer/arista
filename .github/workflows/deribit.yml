@@ -37,6 +37,7 @@ jobs:
         POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
       run: |
         set -e
+        poetry install
         poetry run sync_deribit
 
   # notify_on_failure:
