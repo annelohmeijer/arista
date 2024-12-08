@@ -39,20 +39,20 @@ jobs:
         set -e
         poetry run sync_cmc
 
-  # notify_on_failure:
-  #   name: Notify in Telegram
-  #   runs-on: ubuntu-latest
-  #   needs: [sync]
-  #   if: ${{ failure() }}
-  #   steps:
-  #     - name: Send Telegram message if pipeline fails
-  #       uses: appleboy/telegram-action@master
-  #       with:
-  #         to: "${{ secrets.TELEGRAM_TO }}"
-  #         token: "${{ secrets.TELEGRAM_TOKEN }}"
-  #         message: |
-  #           Pipeline ${{ github.workflow }} failed,
-  #           so database is not up to date.
-  #
-  #           Link to workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  notify_on_failure:
+    name: Notify in Telegram
+    runs-on: ubuntu-latest
+    needs: [sync]
+    if: ${{ failure() }}
+    steps:
+      - name: Send Telegram message if pipeline fails
+        uses: appleboy/telegram-action@master
+        with:
+          to: "${{ secrets.TELEGRAM_TO }}"
+          token: "${{ secrets.TELEGRAM_TOKEN }}"
+          message: |
+            Pipeline **${{ github.workflow }}** failed,
+            so database is not up to date.
+
+            Link to workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
