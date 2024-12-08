@@ -1,8 +1,10 @@
 import logging
 from datetime import datetime, timedelta
 
+import time
 from arista import models
 from arista.api.coinglass import CoinglassAPI
+from arista.api.coinmarketcap import CoinMarketCapAPI
 
 INTERVAL = "12h"
 
@@ -25,7 +27,7 @@ def sync_database(
     """Sync database with funding rates from Coinglass API."""
 
     logger.info(
-        f"Updating {repository._model.__tablename__} for"
+        f"Updating {repository._model.__tablename__} for "
         f"symbol {symbol} until {end_time}"
     )
 
@@ -76,13 +78,27 @@ def main():
     """Sync script to fetch funding rates from
     Coinglass API and store them in the database."""
 
+    logger.info(f"Fetching latest top 100 coins from CoinMarketCap")
+    cmc_client = CoinMarketCapAPI()
+    data = cmc_client.listing_latest()
+    top100_symbols = [d.symbol for d in data]
+    logger.info(f"Top 100 symbols: {top100_symbols}")
+
     symbols = client.get_supported_coins()
+    logger.info(f"Supported symbols on Coinglass: {len(symbols)}")
+
+    logger.info(f"Filtering out unsupported symbols")
+    symbols = [s for s in symbols if s in top100_symbols]
+    logger.info(f"Filtered symbols: {len(symbols)}")
 
     start_time = datetime.now() - timedelta(days=350)
     end_time = datetime.now()
 
-    for repository in [models.OpenInterestRepository(), models.FundingRateRepository()]:
+    # TODO: Add Funding Rate after pipeline is fixed
+    # repositories = [models.FundingRateRepository(), models.OpenInterestRepository()]
+    for repository in [models.OpenInterestRepository()]:
         for symbol in symbols:
+            time.sleep(1)
             sync_database(
                 repository=repository,
                 start_time=start_time,

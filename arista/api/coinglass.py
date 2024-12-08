@@ -7,6 +7,8 @@ from arista.models.open_interest import OpenInterest
 
 logger = logging.getLogger(__name__)
 
+RATE_LIMIT_EXCEEDED = 50001
+
 
 class CoinglassAPI:
     """Coinglass API client.
@@ -55,6 +57,8 @@ class CoinglassAPI:
         r.raise_for_status()
         r = r.json()
         if int(r["code"]) != 0:
+            if r["msg"] == RATE_LIMIT_EXCEEDED:
+                raise ValueError("Rate limit exceeded.")
             raise ValueError(r["msg"])
         if r["msg"] == "success" and len(r["data"]) == 0:
             raise ValueError(f"No data returned for {path} with params {params}.")
