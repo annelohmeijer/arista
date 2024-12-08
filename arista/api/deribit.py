@@ -146,8 +146,7 @@ class DeribitAPI:
 
         if data["result"]["status"] == "no_data":
             raise ValueError(
-                f"Deribit API returned no data for {
-                    date}, future {future}: {instrument_name}"
+                f"Deribit API returned no data for {date}, future {future}: {instrument_name}"
             )
 
         # check timestamp of record
