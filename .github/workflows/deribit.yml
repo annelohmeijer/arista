@@ -33,7 +33,7 @@ jobs:
     - name: Run script
       shell: bash
       env:
-        DERIBIT_API_KEY: ${{ secrets>DERIBIT_API_KEY }}
+        DERIBIT_API_KEY: ${{ secrets.DERIBIT_API_KEY }}
         POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
       run: |
         set -e
