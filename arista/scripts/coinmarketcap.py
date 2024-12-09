@@ -23,8 +23,9 @@ def main():
     if not data:
         raise ValueError("No data fetched from coinmarketcap")
 
-    datetime = data[0].uct
+    datetime = data[0].utc
     logger.info(f"Data fetched for {datetime}")
+    logger.info(f"Fetched {len(data)} records")
     repository.bulk_create(data)
 
 
