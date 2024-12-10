@@ -150,7 +150,8 @@ class DeribitAPI:
             )
 
         # check timestamp of record
-        record_unix_timestamp = int(int(data["usOut"]) / 1000)
+        # assuming usOut is microsecond out?
+        record_unix_timestamp = int(int(data["usOut"]) / 1e6)
 
         record = DeribitFuture(
             asset=symbol,

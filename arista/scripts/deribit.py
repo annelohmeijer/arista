@@ -117,7 +117,7 @@ async def fetch(symbol="BTC"):
 
     logger.info(f"Inserting {len(data)} records into the database, {symbol}")
     repository = models.DeribitFuturesRepository()
-    # repository.bulk_create(data)
+    repository.bulk_create(data)
 
 
 async def main_async():
