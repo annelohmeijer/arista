@@ -62,9 +62,7 @@ cover/
 *.pot
 
 # Jupyter Notebook
-*.ipynb*
 *.ropeproject/
-
 
 # celery beat schedule file
 celerybeat-schedule
