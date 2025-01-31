@@ -1,7 +1,7 @@
 import logging
+import time
 from datetime import datetime, timedelta
 
-import time
 from arista import models
 from arista.api.coinglass import CoinglassAPI
 from arista.api.coinmarketcap import CoinMarketCapAPI

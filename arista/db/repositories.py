@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Generic, TypeVar
 
+from pandas import DataFrame
 from sqlalchemy import and_, delete, func, select
 from sqlmodel import SQLModel
 
@@ -155,15 +156,21 @@ class BaseRepository(Generic[Model]):
         result = self._session.execute(stmt)
         return result.scalar()
 
-    def read_all(self) -> list[Model] | None:
+    def read_all(self, as_df: bool = False) -> list[Model] | None:
         """Read all objects from the table.
+
+        Args:
+            as_df (bool): whether to return the results as dataframe. Else
+                return as scalar.
 
         Returns:
             list[Model] | None: A list of all model objects, or None if none exist.
         """
         stmt = select(self._model)
-        result = self._session.execute(stmt)
-        return result.scalars().all()
+        result = self._session.execute(stmt).scalars().all()
+        if as_df:
+            return DataFrame([x.model_dump() for x in result])
+        return result
 
     def update(self, object_id: int, obj: Model) -> Model:
         """Update an object in the table by its ID.
